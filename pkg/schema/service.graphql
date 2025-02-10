@@ -1,0 +1,48 @@
+scalar Upload
+scalar Time
+
+type Photo {
+    id: String
+    creator: String
+    to: String
+    type: Int
+    height: Int
+    width: Int
+    urls: URLs
+    published: Time
+    updated: Time
+}
+
+type URLs {
+    original: String
+    thumbnail: String
+    avatar: AvatarURLs
+    banner: BannerURLs
+}
+
+type AvatarURLs {
+    x100: String
+    x200: String
+    x400: String
+}
+
+type BannerURLs {
+    medium: String
+    large: String
+}
+
+enum PhotoType {
+    PHOTO
+    AVATAR
+    BANNER
+}
+
+type Query {
+    photos(ids: [String!], sha256: String, sortBy: String, offset: Int, count: Int): [Photo!]
+}
+
+type Mutation {
+    uploadPhoto(type: PhotoType, file: Upload): String
+    updatePhoto(id: String, caption: String, tags: [String!]): Boolean
+    deletePhoto(id: String): Boolean
+}
