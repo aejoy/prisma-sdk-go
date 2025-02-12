@@ -5,11 +5,14 @@ package prisma
 import (
 	"context"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/Yamashou/gqlgenc/clientv2"
+	"github.com/aejoy/prisma-sdk-go/internal/web/dto"
 )
 
 type PrismaGraphQLClient interface {
 	CheckBySha256(ctx context.Context, sha256 *string, interceptors ...clientv2.RequestInterceptor) (*CheckBySha256, error)
+	UploadPhoto(ctx context.Context, typeArg *dto.PhotoType, file *graphql.Upload, interceptors ...clientv2.RequestInterceptor) (*UploadPhoto, error)
 }
 
 type Client struct {
@@ -42,6 +45,17 @@ func (t *CheckBySha256) GetPhotos() []*CheckBySHA256_Photos {
 	return t.Photos
 }
 
+type UploadPhoto struct {
+	UploadPhoto *string "json:\"uploadPhoto,omitempty\" graphql:\"uploadPhoto\""
+}
+
+func (t *UploadPhoto) GetUploadPhoto() *string {
+	if t == nil {
+		t = &UploadPhoto{}
+	}
+	return t.UploadPhoto
+}
+
 const CheckBySha256Document = `query CheckBySHA256 ($sha256: String) {
 	photos(count: 1, sha256: $sha256) {
 		id
@@ -66,6 +80,30 @@ func (c *Client) CheckBySha256(ctx context.Context, sha256 *string, interceptors
 	return &res, nil
 }
 
+const UploadPhotoDocument = `mutation Upload ($type: PhotoType, $file: Upload) {
+	uploadPhoto(type: $type, file: $file)
+}
+`
+
+func (c *Client) UploadPhoto(ctx context.Context, typeArg *dto.PhotoType, file *graphql.Upload, interceptors ...clientv2.RequestInterceptor) (*UploadPhoto, error) {
+	vars := map[string]any{
+		"type": typeArg,
+		"file": file,
+	}
+
+	var res UploadPhoto
+	if err := c.Client.Post(ctx, "Upload", UploadPhotoDocument, &res, vars, interceptors...); err != nil {
+		if c.Client.ParseDataWhenErrors {
+			return &res, err
+		}
+
+		return nil, err
+	}
+
+	return &res, nil
+}
+
 var DocumentOperationNames = map[string]string{
 	CheckBySha256Document: "CheckBySHA256",
+	UploadPhotoDocument:   "Upload",
 }

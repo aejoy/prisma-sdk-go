@@ -1,5 +1,5 @@
 model:
-  package: models
+  package: dto
   filename: ./internal/web/dto/dto.go # https://github.com/99designs/gqlgen/tree/master/plugin/modelgen
 client:
   package: prisma

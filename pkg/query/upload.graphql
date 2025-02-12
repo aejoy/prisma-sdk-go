@@ -1,0 +1,3 @@
+mutation UploadPhoto($type: PhotoType, $file: Upload) {
+    uploadPhoto(type: $type, file: $file)
+}
