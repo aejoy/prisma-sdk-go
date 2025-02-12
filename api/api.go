@@ -2,13 +2,13 @@ package api
 
 import (
 	"context"
-	"errors"
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/aejoy/prisma-sdk-go/internal/web/dto"
 	"net/http"
 
+	"github.com/99designs/gqlgen/graphql"
 	prisma "github.com/aejoy/prisma-sdk-go/internal/web"
+	"github.com/aejoy/prisma-sdk-go/internal/web/dto"
 	"github.com/aejoy/prisma-sdk-go/models"
+	"github.com/aejoy/prisma-sdk-go/pkg/errors"
 )
 
 type API struct {
@@ -51,7 +51,7 @@ func (a API) Upload(context context.Context, typ models.PhotoType, photo *graphq
 
 	photoID := res.GetUploadPhoto()
 	if photoID == nil {
-		return "", errors.New("photo ID not found")
+		return "", errors.ErrPhotoNull
 	}
 
 	return *photoID, err

@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/aejoy/prisma-sdk-go/models"
-	"os"
-	"time"
+	"github.com/aejoy/prisma-sdk-go/pkg/consts"
 
 	"github.com/aejoy/prisma-sdk-go/api"
 )
@@ -15,7 +16,7 @@ import (
 func main() {
 	api := api.New("http://localhost:4000")
 
-	context, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
+	context, cancel := context.WithTimeout(context.TODO(), consts.DefaultTimeout)
 	defer cancel()
 
 	file, err := os.ReadFile("./99c0d458e948ac62b09213f165d8dafb.jpg")

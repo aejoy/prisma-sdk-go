@@ -17,7 +17,8 @@ linters-settings:
           - net/url
           - mime/multipart
           - encoding/json
-          - github.com/pkg/errors
+          - errors
+          - github.com/99designs/gqlgen
           - github.com/aejoy/go-pkg
           - github.com/aejoy/prisma-sdk-go
   lll:
