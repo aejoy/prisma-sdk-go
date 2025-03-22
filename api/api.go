@@ -19,17 +19,25 @@ func New(baseURL string) API {
 	return API{prisma.NewClient(http.DefaultClient, baseURL, nil)}
 }
 
-func (a API) CheckBySHA256(context context.Context, hash string) (photo models.Photo, err error) {
-	res, err := a.client.CheckBySha256(context, &hash)
+func (a API) GetByHash(context context.Context, sha256 string) (photos []models.Photo, err error) {
+	res, err := a.client.GetByHash(context, &sha256)
 	if err != nil {
-		return photo, err
+		return photos, err
 	}
 
-	for _, existPhoto := range res.Photos {
-		photo.ID = *existPhoto.ID
+	for _, photo := range res.Photos {
+		if photo != nil {
+			photo := *photo
+
+			photos = append(photos, models.Photo{
+				ID:        *photo.ID,
+				HasAvatar: *photo.Has.Avatar,
+				HasBanner: *photo.Has.Banner,
+			})
+		}
 	}
 
-	return photo, nil
+	return photos, nil
 }
 
 func (a API) Upload(context context.Context, typ models.PhotoType, photo *graphql.Upload) (string, error) {
@@ -51,7 +59,7 @@ func (a API) Upload(context context.Context, typ models.PhotoType, photo *graphq
 
 	photoID := res.GetUploadPhoto()
 	if photoID == nil {
-		return "", errors.ErrPhotoNull
+		return "", errors.ErrPhotoNil
 	}
 
 	return *photoID, err

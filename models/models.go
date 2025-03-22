@@ -1,7 +1,9 @@
 package models
 
 type Photo struct {
-	ID string
+	ID        string
+	HasAvatar bool
+	HasBanner bool
 }
 
 type PhotoType string

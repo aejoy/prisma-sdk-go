@@ -1,0 +1,3 @@
+query GetByHash($sha256: String) {
+    photos(sha256: $sha256) { id has { avatar banner } }
+}

@@ -24,7 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	photoID, err := api.Upload(context, models.PhotoTypePhoto, &graphql.Upload{
+	photoID, err := api.Upload(context, models.PhotoTypeAvatar, &graphql.Upload{
 		File: bytes.NewReader(file),
 	})
 	if err != nil {

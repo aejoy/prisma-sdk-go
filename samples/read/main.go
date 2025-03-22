@@ -14,10 +14,10 @@ func main() {
 	context, cancel := context.WithTimeout(context.TODO(), consts.DefaultTimeout)
 	defer cancel()
 
-	photo, err := api.CheckBySHA256(context, "5b3b01789bfa80a2872ae6fd1e1acd47f84d54de76e2ee96bff987360d85440ae1220c9256549024d84b75fb8af11b605077ab4501d348dc9dd462de78a2c13e")
+	photos, err := api.GetByHash(context, "ff526ae11096704558d55d0a431aa3f1775e4d36e2af0765f081a873c5bc4e5c6d4d85b23562ab0ddb603062f29ee29c8006dd0da5a7a7a1e1146ac3afe92e4f")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Exist photo:", photo.ID)
+	fmt.Println(photos)
 }

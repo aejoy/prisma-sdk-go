@@ -2,4 +2,4 @@ package errors
 
 import "errors"
 
-var ErrPhotoNull = errors.New("photo is null")
+var ErrPhotoNil = errors.New("photo is nil")

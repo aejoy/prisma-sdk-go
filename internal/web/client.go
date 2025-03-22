@@ -11,7 +11,7 @@ import (
 )
 
 type PrismaGraphQLClient interface {
-	CheckBySha256(ctx context.Context, sha256 *string, interceptors ...clientv2.RequestInterceptor) (*CheckBySha256, error)
+	GetByHash(ctx context.Context, sha256 *string, interceptors ...clientv2.RequestInterceptor) (*GetByHash, error)
 	UploadPhoto(ctx context.Context, typeArg *dto.PhotoType, file *graphql.Upload, interceptors ...clientv2.RequestInterceptor) (*UploadPhoto, error)
 }
 
@@ -23,24 +23,49 @@ func NewClient(cli clientv2.HttpClient, baseURL string, options *clientv2.Option
 	return &Client{Client: clientv2.NewClient(cli, baseURL, options, interceptors...)}
 }
 
-type CheckBySHA256_Photos struct {
-	ID *string "json:\"id,omitempty\" graphql:\"id\""
+type GetByHash_Photos_Has struct {
+	Avatar *bool "json:\"avatar,omitempty\" graphql:\"avatar\""
+	Banner *bool "json:\"banner,omitempty\" graphql:\"banner\""
 }
 
-func (t *CheckBySHA256_Photos) GetID() *string {
+func (t *GetByHash_Photos_Has) GetAvatar() *bool {
 	if t == nil {
-		t = &CheckBySHA256_Photos{}
+		t = &GetByHash_Photos_Has{}
+	}
+	return t.Avatar
+}
+func (t *GetByHash_Photos_Has) GetBanner() *bool {
+	if t == nil {
+		t = &GetByHash_Photos_Has{}
+	}
+	return t.Banner
+}
+
+type GetByHash_Photos struct {
+	Has *GetByHash_Photos_Has "json:\"has,omitempty\" graphql:\"has\""
+	ID  *string               "json:\"id,omitempty\" graphql:\"id\""
+}
+
+func (t *GetByHash_Photos) GetHas() *GetByHash_Photos_Has {
+	if t == nil {
+		t = &GetByHash_Photos{}
+	}
+	return t.Has
+}
+func (t *GetByHash_Photos) GetID() *string {
+	if t == nil {
+		t = &GetByHash_Photos{}
 	}
 	return t.ID
 }
 
-type CheckBySha256 struct {
-	Photos []*CheckBySHA256_Photos "json:\"photos,omitempty\" graphql:\"photos\""
+type GetByHash struct {
+	Photos []*GetByHash_Photos "json:\"photos,omitempty\" graphql:\"photos\""
 }
 
-func (t *CheckBySha256) GetPhotos() []*CheckBySHA256_Photos {
+func (t *GetByHash) GetPhotos() []*GetByHash_Photos {
 	if t == nil {
-		t = &CheckBySha256{}
+		t = &GetByHash{}
 	}
 	return t.Photos
 }
@@ -56,20 +81,24 @@ func (t *UploadPhoto) GetUploadPhoto() *string {
 	return t.UploadPhoto
 }
 
-const CheckBySha256Document = `query CheckBySHA256 ($sha256: String) {
-	photos(count: 1, sha256: $sha256) {
+const GetByHashDocument = `query GetByHash ($sha256: String) {
+	photos(sha256: $sha256) {
 		id
+		has {
+			avatar
+			banner
+		}
 	}
 }
 `
 
-func (c *Client) CheckBySha256(ctx context.Context, sha256 *string, interceptors ...clientv2.RequestInterceptor) (*CheckBySha256, error) {
+func (c *Client) GetByHash(ctx context.Context, sha256 *string, interceptors ...clientv2.RequestInterceptor) (*GetByHash, error) {
 	vars := map[string]any{
 		"sha256": sha256,
 	}
 
-	var res CheckBySha256
-	if err := c.Client.Post(ctx, "CheckBySHA256", CheckBySha256Document, &res, vars, interceptors...); err != nil {
+	var res GetByHash
+	if err := c.Client.Post(ctx, "GetByHash", GetByHashDocument, &res, vars, interceptors...); err != nil {
 		if c.Client.ParseDataWhenErrors {
 			return &res, err
 		}
@@ -80,7 +109,7 @@ func (c *Client) CheckBySha256(ctx context.Context, sha256 *string, interceptors
 	return &res, nil
 }
 
-const UploadPhotoDocument = `mutation Upload ($type: PhotoType, $file: Upload) {
+const UploadPhotoDocument = `mutation UploadPhoto ($type: PhotoType, $file: Upload) {
 	uploadPhoto(type: $type, file: $file)
 }
 `
@@ -92,7 +121,7 @@ func (c *Client) UploadPhoto(ctx context.Context, typeArg *dto.PhotoType, file *
 	}
 
 	var res UploadPhoto
-	if err := c.Client.Post(ctx, "Upload", UploadPhotoDocument, &res, vars, interceptors...); err != nil {
+	if err := c.Client.Post(ctx, "UploadPhoto", UploadPhotoDocument, &res, vars, interceptors...); err != nil {
 		if c.Client.ParseDataWhenErrors {
 			return &res, err
 		}
@@ -104,6 +133,6 @@ func (c *Client) UploadPhoto(ctx context.Context, typeArg *dto.PhotoType, file *
 }
 
 var DocumentOperationNames = map[string]string{
-	CheckBySha256Document: "CheckBySHA256",
-	UploadPhotoDocument:   "Upload",
+	GetByHashDocument:   "GetByHash",
+	UploadPhotoDocument: "UploadPhoto",
 }
